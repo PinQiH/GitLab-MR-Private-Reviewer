@@ -1,80 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <title>GitLab MR Reviewer</title>
-    <style>
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-        width: 300px;
-        padding: 16px;
-        background-color: #f8f9fa;
-      }
-      h2 {
-        font-size: 16px;
-        margin-top: 0;
-      }
-      .form-group {
-        margin-bottom: 12px;
-      }
-      label {
-        display: block;
-        font-size: 12px;
-        font-weight: bold;
-        margin-bottom: 4px;
-      }
-      input[type="text"],
-      input[type="password"] {
-        width: 100%;
-        padding: 6px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-      }
-      button {
-        width: 100%;
-        padding: 8px;
-        background-color: #292961;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-      }
-      button:hover {
-        background-color: #1a1a4b;
-      }
-      .status {
-        margin-top: 8px;
-        font-size: 12px;
-        color: green;
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>GitLab 設定</h2>
-    <div class="form-group">
-      <label for="apiUrl">GitLab Base URL</label>
-      <input type="text" id="apiUrl" placeholder="https://gitlab.example.com" />
-    </div>
-    <div class="form-group">
-      <label for="patToken">Personal Access Token (PAT)</label>
-      <input
-        type="password"
-        id="patToken"
-        placeholder="glpat-xxxxxxxxxxxxxxxxxxxx"
-      />
-    </div>
-    <div class="form-group">
-    <label for="openaiApiKey">OpenAI API Key</label>
-    <input type="password" id="openaiApiKey" placeholder="sk-...">
+<head>
+  <meta charset="UTF-8">
+  <title>GitLab MR Reviewer</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      width: 350px;
+      padding: 16px;
+      background-color: #f8f9fa;
+      margin: 0;
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #e24329;
+      padding-bottom: 8px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #292961;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    button:hover {
+      background-color: #1a1a4b;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #28a745;
+      display: none;
+      text-align: center;
+      font-weight: bold;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 16px 0 8px 0;
+      color: #292961;
+    }
+  </style>
+</head>
+<body>
+  <h2>GitLab MR Reviewer</h2>
+  
+  <div class="section-title">連線設定</div>
+  <div class="form-group">
+    <label for="apiUrl">GitLab Base URL</label>
+    <input type="text" id="apiUrl" placeholder="https://gitlab.example.com">
   </div>
-    <button id="saveBtn">儲存設定</button>
-    <div id="status" class="status">設定已儲存！</div>
+  <div class="form-group">
+    <label for="patToken">GitLab PAT</label>
+    <input type="password" id="patToken" placeholder="glpat-xxxxxxxxxxxxxxxxxxxx">
+  </div>
+  <div class="form-group">
+    <label for="openaiApiKey">OpenAI API Key</label>
+    <input type="password" id="openaiApiKey" placeholder="sk-..." />
+  </div>
 
-    <script src="popup.js"></script>
-  </body>
+  <div class="section-title">AI Review 設定</div>
+  <div class="form-group">
+    <label for="reviewerRole">檢閱者角色 (Reviewer Role)</label>
+    <input type="text" id="reviewerRole" placeholder="例如：資深的後端工程師">
+  </div>
+  <div class="form-group">
+    <label for="reviewProcess">Review 核心流程重點</label>
+    <textarea id="reviewProcess" placeholder="在這裡輸入客製化的審查 Checklist..."></textarea>
+  </div>
+
+  <button id="saveBtn">儲存設定</button>
+  <div id="status" class="status">設定已儲存！</div>
+
+  <script src="popup.js"></script>
+</body>
 </html>

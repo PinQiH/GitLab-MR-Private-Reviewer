@@ -160,7 +160,10 @@ async function startReview(projectPath, mrIid, contentElement, btnElement) {
   btnElement.innerText = '分析中...';
 
   try {
-    const settings = await chrome.storage.local.get(['gitlabApiUrl', 'gitlabPatToken', 'openaiApiKey']);
+    const settings = await chrome.storage.local.get([
+      'gitlabApiUrl', 'gitlabPatToken', 'openaiApiKey', 
+      'reviewerRole', 'reviewProcess'
+    ]);
     
     if (!settings.gitlabApiUrl || !settings.gitlabPatToken) {
       contentElement.innerText = '請先點擊擴充套件圖示，設定 GitLab API URL 與 PAT。';
@@ -221,8 +224,12 @@ async function startReview(projectPath, mrIid, contentElement, btnElement) {
 
     contentElement.innerText = `獲取 Diff 成功，共有 ${validChanges.length} 個檔案變動。\n正在呼叫 OpenAI 進行 Review... (這可能需要幾十秒鐘)`;
     
+    // 預設提示詞 fallback (防禦性)
+    const reviewerRole = settings.reviewerRole || '資深的後端工程師';
+    const reviewProcess = settings.reviewProcess || `1. 功能與邏輯（Correctness）\n2. 程式結構（Design）\n3. 可維護性（Maintainability）\n4. 錯誤處理（Error Handling）\n5. 效能與資安（Performance & Security）\n6. 測試（Testing）`;
+
     // 呼叫 OpenAI API
-    const reviewResult = await callOpenAI(diffText, settings.openaiApiKey);
+    const reviewResult = await callOpenAI(diffText, settings.openaiApiKey, reviewerRole, reviewProcess);
     
     // 顯示結果
     contentElement.innerHTML = parseMarkdown(reviewResult);
@@ -236,16 +243,11 @@ async function startReview(projectPath, mrIid, contentElement, btnElement) {
   }
 }
 
-async function callOpenAI(diffText, apiKey) {
-  const systemPrompt = `你是一個資深的後端工程師。請依照下列 Code Review Workflow SOP 對以下的 GitLab Merge Request (MR) 程式碼差異 (Diff) 進行 Review。
+async function callOpenAI(diffText, apiKey, reviewerRole, reviewProcess) {
+  const systemPrompt = `你是一個${reviewerRole}。請依照下列 Code Review Workflow SOP 對以下的 GitLab Merge Request (MR) 程式碼差異 (Diff) 進行 Review。
 
 ## Review 核心流程（Reviewer SOP）
-1. 功能與邏輯（Correctness）：實作是否符合需求、邊界條件處理、失敗情境是否完整、權限與驗證是否正確。
-2. 程式結構（Design）：責任分層清楚（Controller/Service/Repo）、無不必要耦合、無重複邏輯、命名清楚、可理解。
-3. 可維護性（Maintainability）：程式易讀、邏輯可測試、無 magic number / hard-code、註解解釋「為什麼」而非「做什麼」。
-4. 錯誤處理（Error Handling）：錯誤有被捕捉、回傳格式一致、不吞錯誤、log 有價值資訊。
-5. 效能與資安（Performance & Security）：無明顯效能問題、DB/API 呼叫次數合理、無敏感資訊外洩、無 SQL Injection/XSS 風險。
-6. 測試（Testing）：關鍵邏輯有測試、錯誤與權限有測試、Mock 合理不過度、測試可讀且穩定。
+${reviewProcess}
 
 ## Review 回饋規範
 - 指出問題與原因，並提供具體的改善建議。
