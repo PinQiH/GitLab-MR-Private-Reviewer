@@ -1,4 +1,5 @@
 const DEFAULT_ROLE = '資深的後端工程師';
+const DEFAULT_PREFERRED_LANGUAGE = 'Node.js / Express';
 const DEFAULT_PROCESS = `1. 功能與邏輯（Correctness）：實作是否符合需求、邊界條件處理、失敗情境是否完整、權限與驗證是否正確。
 2. 程式結構（Design）：責任分層清楚（Controller/Service/Repo）、無不必要耦合、無重複邏輯、命名清楚、可理解。
 3. 可維護性（Maintainability）：程式易讀、邏輯可測試、無 magic number / hard-code、註解解釋「為什麼」而非「做什麼」。
@@ -11,16 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const patTokenInput = document.getElementById('patToken');
   const openaiApiKeyInput = document.getElementById('openaiApiKey');
   const reviewerRoleInput = document.getElementById('reviewerRole');
+  const preferredLanguageInput = document.getElementById('preferredLanguage');
   const reviewProcessInput = document.getElementById('reviewProcess');
   const saveBtn = document.getElementById('saveBtn');
   const statusDiv = document.getElementById('status');
 
   // 載入已儲存的設定
-  chrome.storage.local.get(['gitlabApiUrl', 'gitlabPatToken', 'openaiApiKey', 'reviewerRole', 'reviewProcess'], (result) => {
+  chrome.storage.local.get(['gitlabApiUrl', 'gitlabPatToken', 'openaiApiKey', 'reviewerRole', 'preferredLanguage', 'reviewProcess'], (result) => {
     if (result.gitlabApiUrl) apiUrlInput.value = result.gitlabApiUrl;
     if (result.gitlabPatToken) patTokenInput.value = result.gitlabPatToken;
     if (result.openaiApiKey) openaiApiKeyInput.value = result.openaiApiKey;
     
+    preferredLanguageInput.value = result.preferredLanguage || DEFAULT_PREFERRED_LANGUAGE;
     reviewerRoleInput.value = result.reviewerRole || DEFAULT_ROLE;
     reviewProcessInput.value = result.reviewProcess || DEFAULT_PROCESS;
   });
@@ -31,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const patToken = patTokenInput.value.trim();
     const openaiApiKey = openaiApiKeyInput.value.trim();
     const reviewerRole = reviewerRoleInput.value.trim();
+    const preferredLanguage = preferredLanguageInput.value.trim();
     const reviewProcess = reviewProcessInput.value.trim();
 
     chrome.storage.local.set({
@@ -38,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gitlabPatToken: patToken,
       openaiApiKey: openaiApiKey,
       reviewerRole: reviewerRole || DEFAULT_ROLE,
+      preferredLanguage: preferredLanguage || DEFAULT_PREFERRED_LANGUAGE,
       reviewProcess: reviewProcess || DEFAULT_PROCESS
     }, () => {
       // 顯示已儲存的提示
